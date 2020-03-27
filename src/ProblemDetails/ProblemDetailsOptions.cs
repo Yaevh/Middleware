@@ -126,11 +126,31 @@ namespace Hellang.Middleware.ProblemDetails
         /// </summary>
         /// <param name="mapping">The mapping function for creating a a problem details instance.</param>
         /// <typeparam name="TException">The exception type to map using the specified mapping function.</typeparam>
+        /// <remarks>
+        /// Mappers are called in the order they're registered.
+        ///
+        /// Returning null from the mapping function will signify that you can't or don't want to map the exception
+        /// to <see cref="MvcProblemDetails"/>. This will cause cause the exception to be rethrown for other
+        /// upstream middleware to handle.
+        /// </remarks>
         public void Map<TException>(Func<TException, MvcProblemDetails> mapping) where TException : Exception
         {
             Map<TException>((ctx, ex) => mapping(ex));
         }
 
+        /// <summary>
+        /// Maps the specified exception type <typeparamref name="TException"/> to a <see cref="ProblemDetails"/> instance
+        /// using the specified <paramref name="mapping"/> function.
+        /// </summary>
+        /// <param name="mapping">The mapping function for creating a a problem details instance.</param>
+        /// <typeparam name="TException">The exception type to map using the specified mapping function.</typeparam>
+        /// <remarks>
+        /// Mappers are called in the order they're registered.
+        ///
+        /// Returning null from the mapping function will signify that you can't or don't want to map the exception
+        /// to <see cref="MvcProblemDetails"/>. This will cause cause the exception to be rethrown for other
+        /// upstream middleware to handle.
+        /// </remarks>
         public void Map<TException>(Func<HttpContext, TException, MvcProblemDetails> mapping) where TException : Exception
         {
             Mappers.Add(new ExceptionMapper(typeof(TException), (ctx, ex) => mapping(ctx, (TException)ex)));
